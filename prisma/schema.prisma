@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ContactList {
+  id        String    @id @default(uuid())
+  name      String
+  contacts  Contact[]
+  createdAt DateTime  @default(now())
+}
+
+model Contact {
+  id             String          @id @default(uuid())
+  name           String
+  phone          String
+  listId         String
+  list           ContactList     @relation(fields: [listId], references: [id])
+  createdAt      DateTime        @default(now())
+  flowExecutions FlowExecution[]
+  sendQueue      SendQueue[]
+}
+
+model Campaign {
+  id        String   @id @default(uuid())
+  name      String
+  message   String
+  minDelay  Int      @default(5)
+  maxDelay  Int      @default(15)
+  createdAt DateTime @default(now())
+}
+
+model Flow {
+  id             String          @id @default(uuid())
+  name           String
+  steps          FlowStep[]
+  flowExecutions FlowExecution[]
+  createdAt      DateTime        @default(now())
+}
+
+model FlowStep {
+  id           String   @id @default(uuid())
+  flowId       String
+  flow         Flow     @relation(fields: [flowId], references: [id])
+  message      String
+  delayMinutes Int      @default(0)
+  order        Int
+  createdAt    DateTime @default(now())
+}
+
+model FlowExecution {
+  id               String   @id @default(uuid())
+  flowId           String
+  flow             Flow     @relation(fields: [flowId], references: [id])
+  contactId        String
+  contact          Contact  @relation(fields: [contactId], references: [id])
+  currentStepId    String?
+  status           String   @default("PENDING") // PENDING, COMPLETED, ACTIVE
+  nextExecutionAt  DateTime?
+  createdAt        DateTime @default(now())
+}
+
+model SendQueue {
+  id          String   @id @default(uuid())
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id])
+  phone       String
+  message     String
+  scheduledAt DateTime @default(now())
+  status      String   @default("PENDING") // PENDING, SENT, FAILED
+  origin      String?  // CAMPAIGN, FLOW
+  originId    String?
+  createdAt   DateTime @default(now())
+}

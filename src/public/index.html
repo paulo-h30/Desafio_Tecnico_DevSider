@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Leads | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #25D366;
+            --primary-hover: #20ba59;
+            --primary-dark: #075E54;
+            --primary-soft: #e8f9ef;
+            --secondary: #128C7E;
+            --secondary-soft: #eaf6f4;
+            --danger: #ef4444;
+            --danger-soft: #fee2e2;
+            --bg-body: #f8fafc;
+            --sidebar-bg: #111b21;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 78px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            padding: 2rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.03);
+        }
+
+        .sidebar:hover {
+            width: 260px;
+            padding: 2rem 1.25rem;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 0;
+            margin-bottom: 2.5rem;
+            transition: gap 0.3s ease, padding 0.3s ease;
+            justify-content: center;
+        }
+
+        .sidebar:hover .brand {
+            justify-content: flex-start;
+            padding: 0 10px;
+            gap: 12px;
+        }
+
+        .brand svg { fill: var(--primary); width: 32px; height: 32px; min-width: 32px; }
+        .brand h1 { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            letter-spacing: -0.5px;
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar:hover .brand h1 {
+            opacity: 1;
+            max-width: 200px;
+        }
+
+        .nav-list { list-style: none; flex: 1; }
+        .nav-item { margin-bottom: 6px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: padding 0.3s ease, background 0.25s ease, color 0.25s ease;
+            justify-content: center;
+        }
+        
+        .sidebar:hover .nav-link {
+            padding: 12px 16px;
+            justify-content: flex-start;
+        }
+
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-link.active { color: #fff; background: var(--primary-dark); }
+        
+        .nav-link svg { 
+            width: 20px; 
+            height: 20px; 
+            min-width: 20px; 
+            stroke-width: 2; 
+            fill: none; 
+            stroke: currentColor; 
+        }
+
+        .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: opacity 0.15s ease, max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s ease;
+            display: inline-block;
+        }
+
+        .sidebar:hover .nav-link span {
+            opacity: 1;
+            max-width: 150px;
+            margin-left: 12px;
+        }
+
+        .sidebar-footer { 
+            padding: 1.5rem 0; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            display: flex;
+            justify-content: center;
+            transition: padding 0.3s ease;
+        }
+        
+        .sidebar:hover .sidebar-footer {
+            justify-content: flex-start;
+        }
+
+        .sidebar .btn-danger {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.3s ease, padding 0.3s ease, justify-content 0.3s ease;
+            overflow: hidden;
+            margin: 0 auto;
+            gap: 0;
+        }
+
+        .sidebar:hover .btn-danger {
+            width: 100%;
+            border-radius: var(--radius-md);
+            padding: 12px;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sidebar .btn-danger span {
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: opacity 0.15s ease, max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s ease;
+            display: inline-block;
+        }
+
+        .sidebar:hover .btn-danger span {
+            opacity: 1;
+            max-width: 150px;
+            margin-left: 8px;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main { 
+            flex: 1; 
+            margin-left: 100px; 
+            padding: 2.5rem; 
+            max-width: 1300px; 
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
+        .page-info h2 { font-size: 1.875rem; font-weight: 700; color: #0f172a; }
+        .page-info p { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
+
+        .sys-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            padding: 8px 16px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .status-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 0 4px var(--primary-soft); }
+
+        /* --- STATS --- */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.06); }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .stat-val { font-size: 1.5rem; font-weight: 700; display: block; color: #0f172a; }
+        .stat-label { font-size: 0.825rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- DASHBOARD GRID --- */
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+
+        .card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+        .card:hover { box-shadow: 0 12px 24px -5px rgba(0, 0, 0, 0.05), 0 5px 10px -3px rgba(0, 0, 0, 0.02); }
+
+        .card-head {
+            padding: 1.25rem 1.5rem;
+            background: #fafafa;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .step-badge {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-dark);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(7, 94, 84, 0.2);
+        }
+        .card-head h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+        .card-body { padding: 1.75rem; flex: 1; display: flex; flex-direction: column; }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.45;
+        }
+
+        /* --- FORMS --- */
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #334155; }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background: #fff;
+            transition: var(--transition);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px var(--secondary-soft);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .btn-primary { background: var(--secondary); color: #fff; box-shadow: 0 2px 4px rgba(18, 140, 126, 0.15); }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(18, 140, 126, 0.25); }
+        .btn-outline { background: transparent; border: 1.5px solid var(--secondary); color: var(--secondary); }
+        .btn-outline:hover { background: var(--secondary-soft); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { width: auto; padding: 8px 16px; font-size: 0.85rem; }
+
+        /* --- EXPLANATION & CALC PILLS --- */
+        .info-pill {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.825rem;
+            line-height: 1.4;
+            margin-bottom: 1.25rem;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .calc-info-pill {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 1.25rem;
+        }
+        .calc-info-pill span { display: flex; justify-content: space-between; }
+        .calc-info-pill.info-blue { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+
+        /* --- DRAG & DROP ZONE --- */
+        .file-box {
+            border: 2px dashed #cbd5e1;
+            padding: 24px;
+            text-align: center;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: #f8fafc;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .file-box:hover, .file-box.dragover { border-color: var(--secondary); background: var(--secondary-soft); }
+        .file-box svg { width: 32px; height: 32px; stroke: var(--text-muted); transition: var(--transition); }
+        .file-box:hover svg, .file-box.dragover svg { stroke: var(--secondary); }
+        .file-box-text { font-size: 0.875rem; font-weight: 500; color: #475569; }
+        .file-box-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+        .file-details {
+            background: var(--secondary-soft);
+            border: 1px solid #b2dfdb;
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .file-info-text { display: flex; align-items: center; gap: 10px; font-size: 0.875rem; font-weight: 600; color: var(--primary-dark); }
+        .file-remove-btn { cursor: pointer; color: var(--danger); font-weight: 700; border: none; background: transparent; padding: 4px 8px; }
+
+        /* --- CSV HELPER TOGGLE --- */
+        .csv-helper-toggle {
+            font-size: 0.825rem;
+            color: var(--secondary);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 1rem;
+            user-select: none;
+        }
+        .csv-helper-toggle:hover { text-decoration: underline; }
+        .csv-helper-content {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 1.25rem;
+            animation: fadeIn 0.25s ease;
+        }
+        .csv-helper-content p { font-size: 0.775rem; color: #475569; margin-bottom: 8px; line-height: 1.4; }
+        .csv-helper-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .csv-helper-table th, .csv-helper-table td { padding: 6px 10px; border: 1px solid var(--border); }
+        .csv-helper-table th { background: #f1f5f9; font-weight: 700; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- VERTICAL TIMELINE --- */
+        .flow-timeline-wrap {
+            background: #f8fafc;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 1.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .timeline-container {
+            position: relative;
+            padding-left: 28px;
+        }
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: var(--border);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .timeline-item:last-child { margin-bottom: 0; }
+        
+        .timeline-badge {
+            position: absolute;
+            left: -28px;
+            top: 2px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 2;
+            border: 2px solid white;
+        }
+        
+        .timeline-content {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .timeline-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.725rem;
+        }
+        .timeline-tag {
+            background: var(--secondary-soft);
+            color: var(--secondary);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .timeline-delay { color: var(--text-muted); font-weight: 500; }
+        .timeline-msg { font-size: 0.8rem; color: var(--text-main); font-weight: 400; line-height: 1.35; }
+        
+        .empty-timeline {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-muted);
+        }
+        .empty-timeline p { font-size: 0.85rem; font-weight: 600; margin-top: 6px; }
+
+        /* --- TAB SYSTEM FOR CARD 4 --- */
+        .tab-control {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.25rem;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: #fff;
+            color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+        .tab-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1.25rem; }
+
+        /* --- TABLES --- */
+        .table-wrap { background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--card-shadow); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 14px 20px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 14px 20px; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: #f1f5f9; }
+
+        /* --- OVERLAY --- */
+        .overlay {
+            position: fixed;
+            top: 0; right: 0;
+            width: 440px; height: 100vh;
+            background: #fff; z-index: 100;
+            box-shadow: -10px 0 25px rgba(0,0,0,0.05);
+            padding: 2.5rem;
+            transform: translateX(100%);
+            transition: var(--transition);
+            overflow-y: auto;
+        }
+        .overlay.open { transform: translateX(0); }
+        .overlay-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .close-btn { cursor: pointer; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; }
+
+        .alert {
+            position: fixed; bottom: 2rem; right: 2rem;
+            padding: 12px 24px; border-radius: var(--radius-md);
+            color: #fff; font-weight: 600; display: none;
+            z-index: 1000; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        .alert.show { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* --- FLOATING PROGRESS WIDGET --- */
+        .progress-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            z-index: 90;
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(0);
+        }
+        
+        .progress-widget.minimized {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(18, 140, 126, 0.35);
+            background: var(--secondary);
+            border: none;
+        }
+        
+        .progress-widget.minimized:hover {
+            transform: scale(1.05);
+            background: var(--primary-dark);
+        }
+        
+        .widget-header {
+            background: var(--secondary);
+            color: #fff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .widget-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .widget-toggle-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        .widget-toggle-btn:hover { background: rgba(255,255,255,0.15); }
+        
+        .widget-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .progress-bar-container {
+            background: #f1f5f9;
+            border-radius: 99px;
+            height: 10px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        
+        .widget-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            gap: 6px;
+        }
+        .widget-stat { display: flex; flex-direction: column; gap: 4px; }
+        .widget-stat-val { font-size: 0.95rem; font-weight: 700; }
+        .widget-stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .widget-stat.pending .widget-stat-val { color: #d97706; }
+        .widget-stat.sent .widget-stat-val { color: #16a34a; }
+        .widget-stat.failed .widget-stat-val { color: #dc2626; }
+        
+        .widget-log-title {
+            font-size: 0.725rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .widget-log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 110px;
+            overflow-y: auto;
+        }
+        .widget-log-item {
+            font-size: 0.725rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border-left: 3px solid #cbd5e1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .widget-log-item.sent { border-left-color: #22c55e; }
+        .widget-log-item.failed { border-left-color: #ef4444; }
+        .widget-log-item.pending { border-left-color: #eab308; }
+        
+        .widget-log-info { display: flex; flex-direction: column; gap: 2px; }
+        .widget-log-name { font-weight: 600; color: var(--text-main); }
+        .widget-log-phone { font-size: 0.65rem; color: var(--text-muted); }
+        
+        .widget-log-status { font-weight: 700; font-size: 0.65rem; display: flex; align-items: center; gap: 2px; }
+        .widget-log-status.sent { color: #16a34a; }
+        .widget-log-status.failed { color: #dc2626; }
+        .widget-log-status.pending { color: #d97706; }
+        
+        .widget-mini-icon {
+            display: none;
+            color: white;
+            font-size: 1.35rem;
+            position: relative;
+        }
+        .progress-widget.minimized .widget-mini-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .progress-widget.minimized .widget-header,
+        .progress-widget.minimized .widget-body {
+            display: none;
+        }
+        
+        .widget-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #d97706;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border: 2px solid var(--secondary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #25d366;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+            animation: widgetPulse 1.8s infinite;
+        }
+
+        @keyframes widgetPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(37, 211, 102, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        /* --- UTILS --- */
+        .mt-10 { margin-top: 10px; }
+        .mb-20 { margin-bottom: 20px; }
+
+        @media (max-width: 1200px) { .grid { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.551 4.12 1.517 5.867L.24 24l6.27-1.64A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12.001-12zM12 22.036c-1.89 0-3.69-.485-5.267-1.353l-.377-.215-3.916 1.02.102-3.816-.237-.394A9.97 9.97 0 012.036 12C2.036 6.491 6.49 2.036 12 2.036 17.509 2.036 21.964 6.49 21.964 12c0 5.51-4.455 9.964-9.964 9.964.001.072 0 .072 0 0zm5.496-7.514c-.301-.151-1.782-.881-2.059-.982-.276-.1-.478-.151-.678.151-.2.302-.779.982-.955 1.183-.176.201-.351.226-.653.075-1.503-.758-2.618-1.579-3.554-3.153-.176-.301-.019-.464.132-.615.135-.135.301-.351.451-.527.151-.176.201-.301.301-.502.101-.201.05-.377-.025-.527-.075-.151-.678-1.633-.929-2.235-.246-.588-.495-.508-.678-.517-.176-.008-.377-.01-.578-.01-.201 0-.527.075-.803.377-.276.301-1.054 1.03-1.054 2.511 0 1.482 1.079 2.913 1.23 3.114.151.201 2.119 3.235 5.132 4.537 1.942.84 2.656.91 3.551.764.767-.125 2.378-.96 2.716-1.892.338-.934.338-1.737.238-1.908-.101-.176-.377-.277-.679-.427z"/></svg>
+            <h1>Flow Leads</h1>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="nav('dashboard', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="nav('contacts', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Contatos</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn btn-danger" onclick="resetSys()"><svg style="width:16px;height:16px;stroke:#fff;display:block;min-width:16px;min-height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><span>Resetar Sistema</span></button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div class="page-info">
+                <h2 id="viewTitle">Dashboard</h2>
+                <p id="viewDesc">Controle total dos seus disparos e fluxos.</p>
+            </div>
+            <div class="sys-status">
+                <div class="status-dot"></div>
+                Sistema Online
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats">
+                <div class="stat-card"><div class="stat-icon">👥</div><div><span class="stat-val" id="statContacts">-</span><span class="stat-label">Contatos</span></div></div>
+                <div class="stat-card"><div class="stat-icon">🚀</div><div><span class="stat-val" id="statCampaigns">-</span><span class="stat-label">Campanhas</span></div></div>
+                <div class="stat-card"><div class="stat-icon">⚡</div><div><span class="stat-val" id="statFlows">-</span><span class="stat-label">Fluxos Ativos</span></div></div>
+            </div>
+
+            <div class="grid">
+                
+                <!-- CARD 1: IMPORTAR LEADS -->
+                <div class="card">
+                    <div class="card-head"><div class="step-badge">1</div><h3>Importar Leads</h3></div>
+                    <div class="card-body">
+                        <p class="card-desc">Cadastre suas listas de contatos no sistema de forma rápida. O formato aceito é arquivo <b>CSV</b>.</p>
+                        
+                        <div class="form-group">
+                            <label>Nome da Lista</label>
+                            <input type="text" id="listName" placeholder="Ex: Clientes Quentes Maio">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Arquivo de Contatos</label>
+                            
+                            <!-- Drag & Drop Zone -->
+                            <div class="file-box" id="dropZone" onclick="document.getElementById('csvFile').click()">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <span class="file-box-text" id="dropZonePrompt">Arraste o arquivo CSV ou clique para selecionar</span>
+                                <span class="file-box-sub">Tamanho máximo: 10MB</span>
+                                <input type="file" id="csvFile" accept=".csv" style="display:none">
+                            </div>
+                        </div>
+
+                        <!-- Selected File Details (Dynamic) -->
+                        <div id="fileDetails" class="file-details" style="display:none;">
+                            <div class="file-info-text">
+                                <span>📄</span>
+                                <div style="display:flex; flex-direction:column;">
+                                    <span id="fileNameSpan" style="word-break:break-all;">contatos.csv</span>
+                                    <span id="fileSizeSpan" style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">0 KB</span>
+                                </div>
+                            </div>
+                            <button class="file-remove-btn" onclick="removeSelectedFile()" title="Remover arquivo">✕</button>
+                        </div>
+
+                        <!-- CSV Helper Accordion -->
+                        <span class="csv-helper-toggle" onclick="toggleCsvHelper()">
+                            ℹ️ Como deve ser o formato do arquivo CSV?
+                        </span>
+                        <div class="csv-helper-content" id="csvHelper">
+                            <p>O arquivo CSV deve possuir as colunas <b>Nome</b> e <b>Telefone</b> (com o código do país, ex: 55).</p>
+                            <table class="csv-helper-table">
+                                <thead>
+                                    <tr><th>Nome</th><th>Telefone</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>João Teste</td><td>5511999990001</td></tr>
+                                    <tr><td>Maria Exemplo</td><td>5531998923578</td></tr>
+                                </tbody>
+                            </table>
+                            <button class="btn btn-outline btn-sm" onclick="downloadSampleCSV()" style="width:100%;">⬇️ Baixar CSV de Exemplo</button>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="importContacts()">Importar Contatos</button>
+                    </div>
+                </div>
+
+                <!-- CARD 2: NOVA CAMPANHA -->
+                <div class="card">
+                    <div class="card-head"><div class="step-badge">2</div><h3>Criar Modelo de Campanha</h3></div>
+                    <div class="card-body">
+                        <p class="card-desc">Crie modelos de mensagens prontas para enviar às suas campanhas.</p>
+                        
+                        <div class="form-group">
+                            <label>Nome do Modelo</label>
+                            <input type="text" id="campaignName" placeholder="Ex: Boas-vindas Black Friday">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0.75rem;">
+                            <label>Mensagem</label>
+                            <textarea id="campaignMessage" rows="5" placeholder="Olá, tudo bem? Emojis e quebras de linha funcionam perfeitamente!"></textarea>
+                        </div>
+
+                        <!-- Interval of Security Explanation -->
+                        <div class="info-pill" style="margin-top: 1rem;">
+                            <span>🛡️</span>
+                            <div>
+                                <b>Intervalo de Segurança Anti-Bloqueio:</b> O WhatsApp monitora a velocidade dos envios. Usamos um intervalo aleatório entre os segundos configurados para imitar a digitação humana e proteger seu chip de banimentos.
+                            </div>
+                        </div>
+
+                        <div class="grid" style="gap:1rem; margin-bottom:1.5rem; grid-template-columns: repeat(2, 1fr);">
+                            <div class="form-group" style="margin:0">
+                                <label>Intervalo Mín (s)</label>
+                                <input type="number" id="minDelay" value="15">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Intervalo Máx (s)</label>
+                                <input type="number" id="maxDelay" value="45">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="createCampaign()">Salvar Modelo de Campanha</button>
+                    </div>
+                </div>
+
+                <!-- CARD 3: AUTOMAÇÃO (FLUXO/FUNIL) -->
+                <div class="card">
+                    <div class="card-head"><div class="step-badge">3</div><h3>Régua de Automação (Funil)</h3></div>
+                    <div class="card-body">
+                        <p class="card-desc">Cadastre funis inteligentes contendo sequências de mensagens. Seus leads receberão cada etapa automaticamente conforme os prazos definidos.</p>
+                        
+                        <!-- Create flow action -->
+                        <div class="form-group" style="background:#f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: var(--radius-md); margin-bottom:1.25rem;">
+                            <label style="color:var(--secondary);">➕ Criar Novo Funil</label>
+                            <div style="display:flex;gap:8px; margin-top: 6px;">
+                                <input type="text" id="flowName" placeholder="Ex: Funil de Vendas Quente">
+                                <button class="btn btn-primary btn-sm" onclick="createFlow()">Criar</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Selecione o Funil para Configurar</label>
+                            <select id="flowSelect" class="mb-20" onchange="renderFlowTimeline()"></select>
+                        </div>
+
+                        <!-- Visual Timeline Area (Dynamic) -->
+                        <label>Sequência Atual de Mensagens</label>
+                        <div class="flow-timeline-wrap">
+                            <div id="flowTimeline">
+                                <div class="empty-timeline">
+                                    <div style="font-size:2rem;">⚡</div>
+                                    <p>Nenhum funil carregado.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step add box -->
+                        <div class="exec-box flow" style="background: #f8fafc; border: 1px solid var(--border); padding:16px; border-radius: var(--radius-md);">
+                            <div class="exec-title" style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--secondary); display: flex; align-items: center; gap: 6px;">
+                                📥 Adicionar Nova Etapa ao Funil
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Mensagem da Etapa</label>
+                                <textarea id="stepMessage" placeholder="Olá! Obrigado por entrar em contato... Esta será a mensagem do passo." style="min-height: 70px;"></textarea>
+                            </div>
+                            
+                            <div class="grid" style="gap:1rem; grid-template-columns: 1.2fr 0.8fr; margin-bottom: 1rem;">
+                                <div class="form-group" style="margin:0">
+                                    <label>Tempo de Espera (minutos)</label>
+                                    <input type="number" id="stepDelay" value="10">
+                                    <span style="font-size:0.7rem; color:var(--text-muted);">Tempo decorrido após a etapa anterior</span>
+                                </div>
+                                <div class="form-group" style="margin:0">
+                                    <label>Ordem da Etapa</label>
+                                    <input type="number" id="stepOrder" value="1">
+                                    <span style="font-size:0.7rem; color:var(--text-muted);">Posição na sequência</span>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-outline" onclick="addStep()">Adicionar à Sequência</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 4: EXECUTAR AÇÕES (Disparador inteligente) -->
+                <div class="card">
+                    <div class="card-head"><div class="step-badge">4</div><h3>Central de Disparos</h3></div>
+                    <div class="card-body">
+                        <p class="card-desc">Com as listas, modelos e funis configurados, agora você pode disparar. Escolha o tipo de disparo abaixo.</p>
+                        
+                        <!-- Segmented Controls / Tab System -->
+                        <div class="tab-control">
+                            <button class="tab-btn active" id="tabCampaignBtn" onclick="switchExecTab('campaignTab')">🚀 Disparo Único</button>
+                            <button class="tab-btn" id="tabFlowBtn" onclick="switchExecTab('flowTab')">⚡ Automação de Funil</button>
+                        </div>
+
+                        <!-- TAB CONTENT: CAMPAIGN -->
+                        <div id="campaignTab" class="tab-content active">
+                            <p class="tab-desc">Dispara uma mensagem padrão única para toda a lista de leads selecionada de forma sequencial. Ideal para comunicados gerais, novidades rápidas ou avisos pontuais.</p>
+                            
+                            <div class="form-group">
+                                <label>Selecione o Modelo de Campanha (Passo 2)</label>
+                                <select id="startCampaignSelect" class="mb-20" onchange="updateCalculations()"></select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Selecione a Lista de Leads (Passo 1)</label>
+                                <select id="startListSelect" class="mb-20" onchange="updateCalculations()"></select>
+                            </div>
+
+                            <!-- Calculations Preview Block (Didactic time estimator) -->
+                            <div id="campaignCalcBox" class="calc-container" style="display:none;"></div>
+
+                            <button class="btn btn-primary" onclick="startCampaign()" style="background:var(--secondary)">🚀 Iniciar Disparo Único</button>
+                        </div>
+
+                        <!-- TAB CONTENT: FLOW -->
+                        <div id="flowTab" class="tab-content">
+                            <p class="tab-desc">Insere a lista de contatos em um funil automatizado inteligente. Cada lead passará a receber a sequência de etapas configuradas individualmente de acordo com a agenda de prazos.</p>
+                            
+                            <div class="form-group">
+                                <label>Selecione o Funil / Régua (Passo 3)</label>
+                                <select id="startFlowSelect" class="mb-20" onchange="updateCalculationsFlow()"></select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Selecione a Lista de Leads (Passo 1)</label>
+                                <select id="startListSelectFlow" class="mb-20" onchange="updateCalculationsFlow()"></select>
+                            </div>
+
+                            <!-- Calculations Flow Preview -->
+                            <div id="flowCalcBox" class="calc-container" style="display:none;"></div>
+
+                            <button class="btn btn-primary" onclick="startFlow()">⚡ Ativar Funil de Automação</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- CONTACTS VIEW -->
+        <section id="contacts" class="content-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                <h3>Suas Listas</h3>
+                <button class="btn btn-primary btn-sm" onclick="openManualModal()">+ Adicionar Contato</button>
+            </div>
+            <div class="table-wrap"><table id="listsTable"><thead><tr><th>Nome da Lista</th><th>Data Criação</th><th>Contatos</th><th>Ações</th></tr></thead><tbody id="listsBody"></tbody></table></div>
+        </section>
+    </main>
+
+    <!-- FLOATING PROGRESS WIDGET -->
+    <div id="progressWidget" class="progress-widget minimized" style="display: none;" onclick="handleWidgetClick(event)">
+        <!-- Mini Icon for collapsed mode -->
+        <div class="widget-mini-icon">
+            ⚡
+            <span id="widgetBadge" class="widget-badge" style="display: none;">0</span>
+        </div>
+        
+        <!-- Header for expanded mode -->
+        <div class="widget-header">
+            <div class="widget-title">
+                <span class="pulse-dot"></span>
+                Progresso de Envio
+            </div>
+            <button class="widget-toggle-btn" onclick="toggleWidget(event)">−</button>
+        </div>
+        
+        <!-- Body for expanded mode -->
+        <div class="widget-body">
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.775rem; font-weight: 600; margin-bottom: 6px;">
+                    <span id="widgetProgressPercent">Progresso: 0%</span>
+                    <span id="widgetProgressRatio">0/0</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="widgetProgressBarFill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+            
+            <div class="widget-stats">
+                <div class="widget-stat pending">
+                    <span class="widget-stat-val" id="widgetPending">0</span>
+                    <span class="widget-stat-label">Fila</span>
+                </div>
+                <div class="widget-stat sent">
+                    <span class="widget-stat-val" id="widgetSent">0</span>
+                    <span class="widget-stat-label">Enviados</span>
+                </div>
+                <div class="widget-stat failed">
+                    <span class="widget-stat-val" id="widgetFailed">0</span>
+                    <span class="widget-stat-label">Falhas</span>
+                </div>
+            </div>
+            
+            <div class="widget-log-title">Disparos Recentes</div>
+            <div class="widget-log-list" id="widgetLogList">
+                <div style="text-align: center; font-size: 0.7rem; color: var(--text-muted); padding: 8px;">Nenhum envio registrado.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay">
+        <div class="overlay-head"><h3 id="overTitle">Detalhes</h3><button class="close-btn" onclick="closeOver()">✕</button></div>
+        <div id="overContent"></div>
+    </div>
+
+    <div id="toast" class="alert"></div>
+
+    <script>
+        // Global variables for dashboard states
+        let globalFlows = [];
+        let globalLists = [];
+        let globalCampaigns = [];
+        
+        let isWidgetMinimized = true;
+        let queuePollingInterval = null;
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function nav(id, el) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('viewTitle').innerText = id === 'dashboard' ? 'Dashboard' : 'Contatos';
+            if(id === 'contacts') loadContactsPage();
+        }
+
+        function toast(msg, type='success') {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.background = type === 'success' ? 'var(--primary-dark)' : 'var(--danger)';
+            t.className = 'alert show';
+            setTimeout(() => t.className = 'alert', 4000);
+        }
+
+        async function api(url, method='GET', data=null) {
+            const opt = { method, headers: { 'Content-Type': 'application/json' } };
+            if(data) opt.body = JSON.stringify(data);
+            return (await fetch(url, opt)).json();
+        }
+
+        async function updateStats() {
+            const lists = await api('/api/lists');
+            const cams = await api('/api/campaigns');
+            const flows = await api('/api/flows');
+            document.getElementById('statContacts').innerText = lists.reduce((a, b) => a + b._count.contacts, 0);
+            document.getElementById('statCampaigns').innerText = cams.length;
+            document.getElementById('statFlows').innerText = flows.length;
+        }
+
+        // --- DRAG & DROP FOR CSV FILE ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('csvFile');
+
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect();
+                }
+            });
+            
+            fileInput.addEventListener('change', handleFileSelect);
+        }
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                document.getElementById('fileDetails').style.display = 'flex';
+                document.getElementById('fileNameSpan').innerText = file.name;
+                document.getElementById('fileSizeSpan').innerText = (file.size / 1024).toFixed(1) + ' KB';
+                document.getElementById('dropZonePrompt').style.display = 'none';
+            }
+        }
+
+        function removeSelectedFile() {
+            fileInput.value = '';
+            document.getElementById('fileDetails').style.display = 'none';
+            document.getElementById('dropZonePrompt').style.display = 'block';
+        }
+
+        // --- CSV HELPER ACCORDION ---
+        function toggleCsvHelper() {
+            const helper = document.getElementById('csvHelper');
+            if (helper.style.display === 'block') {
+                helper.style.display = 'none';
+            } else {
+                helper.style.display = 'block';
+            }
+        }
+
+        function downloadSampleCSV() {
+            const csvContent = "data:text/csv;charset=utf-8,Nome,Telefone\nJoão Teste,5511999990001\nMaria Exemplo,5531998923578\nCarlos Sem DDI,11977776666\nAna Com DDI,5531975572524\n";
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "contatos_exemplo.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- DYNAMIC TIMELINE OF FLOW STEPS ---
+        function renderFlowTimeline() {
+            const flowId = document.getElementById('flowSelect').value;
+            const timeline = document.getElementById('flowTimeline');
+            if (!flowId) {
+                timeline.innerHTML = `
+                    <div class="empty-timeline">
+                        <div style="font-size: 2rem;">⚡</div>
+                        <p>Nenhum funil selecionado ou cadastrado.</p>
+                        <p style="font-size:0.8rem; font-weight:normal; margin-top:4px;">Crie um novo funil acima para começar a adicionar as réguas.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const flow = globalFlows.find(f => f.id === flowId);
+            if (!flow || !flow.steps || flow.steps.length === 0) {
+                timeline.innerHTML = `
+                    <div class="empty-timeline">
+                        <div style="font-size: 2rem;">⚡</div>
+                        <p>Nenhuma etapa neste funil ainda</p>
+                        <p style="font-size:0.8rem; font-weight:normal; margin-top:4px;">Este fluxo está vazio. Utilize o formulário abaixo para adicionar mensagens e criar sua automação sequencial.</p>
+                    </div>
+                `;
+                // Set default order for the new step to 1
+                document.getElementById('stepOrder').value = 1;
+                return;
+            }
+            
+            // Sort steps by order ascending
+            const sortedSteps = [...flow.steps].sort((a, b) => a.order - b.order);
+            
+            // Auto calculate next step order to be didactic!
+            const nextOrder = sortedSteps[sortedSteps.length - 1].order + 1;
+            document.getElementById('stepOrder').value = nextOrder;
+            
+            timeline.innerHTML = `
+                <div class="timeline-container">
+                    ${sortedSteps.map((step, idx) => `
+                        <div class="timeline-item">
+                            <div class="timeline-badge">${step.order || (idx + 1)}</div>
+                            <div class="timeline-content">
+                                <div class="timeline-meta">
+                                    <span class="timeline-tag">Etapa ${step.order || (idx + 1)}</span>
+                                    <span class="timeline-delay">⏱️ Aguardar <b>${step.delayMinutes} minutos</b></span>
+                                </div>
+                                <p class="timeline-msg">${escapeHTML(step.message).replace(/\n/g, '<br>')}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // --- EXECUTION TABS FOR CARD 4 ---
+        function switchExecTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if (tabId === 'campaignTab') {
+                document.getElementById('tabCampaignBtn').classList.add('active');
+                updateCalculations();
+            } else {
+                document.getElementById('tabFlowBtn').classList.add('active');
+                updateCalculationsFlow();
+            }
+        }
+
+        // --- DYNAMIC CALCULATIONS AND PREVIEWS ---
+        function updateCalculations() {
+            const listId = document.getElementById('startListSelect').value;
+            const campaignId = document.getElementById('startCampaignSelect').value;
+            const calcBox = document.getElementById('campaignCalcBox');
+            
+            if (listId && campaignId) {
+                const list = globalLists.find(l => l.id === listId);
+                const camp = globalCampaigns.find(c => c.id === campaignId);
+                if (list && camp) {
+                    const count = list._count.contacts;
+                    const avgDelay = (camp.minDelay + camp.maxDelay) / 2;
+                    const totalSec = count * avgDelay;
+                    const totalMin = Math.round(totalSec / 60);
+                    
+                    let durationText = "";
+                    if (totalMin < 1) {
+                        durationText = `~${Math.round(totalSec)} segundos`;
+                    } else {
+                        durationText = `~${totalMin} minutos`;
+                    }
+                    
+                    calcBox.innerHTML = `
+                        <div class="calc-info-pill">
+                            <span>👥 Leads destinatários: <b>${count} contatos</b></span>
+                            <span>⏱️ Intervalo médio por envio: <b>${avgDelay}s</b></span>
+                            <span>🕒 Duração total estimada do envio: <b>${durationText}</b></span>
+                        </div>
+                    `;
+                    calcBox.style.display = 'block';
+                    return;
+                }
+            }
+            calcBox.style.display = 'none';
+        }
+
+        function updateCalculationsFlow() {
+            const listId = document.getElementById('startListSelectFlow').value;
+            const flowId = document.getElementById('startFlowSelect').value;
+            const calcBox = document.getElementById('flowCalcBox');
+            
+            if (listId && flowId) {
+                const list = globalLists.find(l => l.id === listId);
+                const flow = globalFlows.find(f => f.id === flowId);
+                if (list && flow) {
+                    const count = list._count.contacts;
+                    const stepsCount = flow.steps ? flow.steps.length : 0;
+                    
+                    calcBox.innerHTML = `
+                        <div class="calc-info-pill info-blue">
+                            <span>👥 Leads a entrar no funil: <b>${count} contatos</b></span>
+                            <span>⚡ Total de etapas configuradas: <b>${stepsCount} mensagens</b></span>
+                            <span>🚀 Primeiro passo do funil: <b>Imediato</b></span>
+                        </div>
+                    `;
+                    calcBox.style.display = 'block';
+                    return;
+                }
+            }
+            calcBox.style.display = 'none';
+        }
+
+        // --- FLOATING SEND QUEUE WIDGET LOGIC ---
+        function handleWidgetClick(e) {
+            // Expand ONLY if it is minimized and they clicked the bubble
+            if (isWidgetMinimized) {
+                expandWidget();
+            }
+        }
+
+        function toggleWidget(e) {
+            e.stopPropagation(); // Stop click from bubling to handleWidgetClick
+            if (isWidgetMinimized) {
+                expandWidget();
+            } else {
+                minimizeWidget();
+            }
+        }
+
+        function expandWidget() {
+            const w = document.getElementById('progressWidget');
+            w.classList.remove('minimized');
+            isWidgetMinimized = false;
+            document.querySelector('.widget-toggle-btn').innerText = '−';
+            pollQueueStatus();
+        }
+
+        function minimizeWidget() {
+            const w = document.getElementById('progressWidget');
+            w.classList.add('minimized');
+            isWidgetMinimized = true;
+            pollQueueStatus();
+        }
+
+        async function pollQueueStatus() {
+            try {
+                const data = await api('/api/system/queue');
+                if (data.error) return;
+
+                const { pending, sent, failed, total, recent } = data;
+
+                // Hide completely if there are absolutely no items in database
+                if (total === 0) {
+                    document.getElementById('progressWidget').style.display = 'none';
+                    return;
+                } else {
+                    document.getElementById('progressWidget').style.display = 'flex';
+                }
+
+                // Update badge (shows number of pending sends in minimized state)
+                const badge = document.getElementById('widgetBadge');
+                badge.innerText = pending;
+                badge.style.display = pending > 0 ? 'flex' : 'none';
+
+                // Update stats
+                document.getElementById('widgetPending').innerText = pending;
+                document.getElementById('widgetSent').innerText = sent;
+                document.getElementById('widgetFailed').innerText = failed;
+                document.getElementById('widgetProgressRatio').innerText = `${sent + failed}/${total}`;
+
+                // Calculate progress %
+                const pct = total > 0 ? Math.round(((sent + failed) / total) * 100) : 0;
+                document.getElementById('widgetProgressPercent').innerText = `Progresso: ${pct}%`;
+                document.getElementById('widgetProgressBarFill').style.width = `${pct}%`;
+
+                // Render log list
+                const logList = document.getElementById('widgetLogList');
+                if (recent && recent.length > 0) {
+                    logList.innerHTML = recent.map(item => {
+                        let statusIcon = "🕒";
+                        let statusClass = "pending";
+                        let statusLabel = "Fila";
+                        
+                        if (item.status === 'SENT') {
+                            statusIcon = "✅";
+                            statusClass = "sent";
+                            statusLabel = "Enviado";
+                        } else if (item.status === 'FAILED') {
+                            statusIcon = "❌";
+                            statusClass = "failed";
+                            statusLabel = "Falhou";
+                        }
+
+                        return `
+                            <div class="widget-log-item ${statusClass}">
+                                <div class="widget-log-info">
+                                    <span class="widget-log-name">${escapeHTML(item.contactName)}</span>
+                                    <span class="widget-log-phone">${escapeHTML(item.phone)}</span>
+                                </div>
+                                <span class="widget-log-status ${statusClass}">${statusIcon} ${statusLabel}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    logList.innerHTML = `<div style="text-align: center; font-size: 0.7rem; color: var(--text-muted); padding: 8px;">Nenhum envio registrado.</div>`;
+                }
+
+            } catch (err) {
+                console.error("Erro ao atualizar status da fila de envio:", err);
+            }
+        }
+
+        // --- BACKEND API HANDLERS ---
+        async function importContacts() {
+            const name = document.getElementById('listName').value;
+            const file = document.getElementById('csvFile').files[0];
+            if(!name || !file) return toast('Preencha o nome da lista e selecione o arquivo CSV', 'error');
+            
+            const fd = new FormData(); 
+            fd.append('name', name); 
+            fd.append('file', file);
+            
+            const res = await fetch('/api/contacts/import', { method: 'POST', body: fd });
+            const data = await res.json();
+            if(data.error) {
+                toast(data.error, 'error');
+            } else { 
+                toast('Lista de leads importada com sucesso!'); 
+                document.getElementById('listName').value = '';
+                removeSelectedFile();
+                updateDashboard(); 
+            }
+        }
+
+        async function loadContactsPage() {
+            const lists = await api('/api/lists');
+            document.getElementById('listsBody').innerHTML = lists.map(l => `<tr><td><b>${escapeHTML(l.name)}</b></td><td>${new Date(l.createdAt).toLocaleDateString()}</td><td><span class="step-badge" style="background:var(--secondary-soft);color:var(--secondary)">${l._count.contacts}</span></td><td style="display:flex;gap:6px;align-items:center;"><button class="btn btn-outline btn-sm" onclick="viewList('${l.id}', '${l.name.replace(/'/g, "\\\\'").replace(/"/g, "&quot;")}')" title="Ver Contatos" style="padding:6px 8px;line-height:1;"><svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><button class="btn btn-danger btn-sm" onclick="deleteList('${l.id}', '${l.name.replace(/'/g, "\\\\'").replace(/"/g, "&quot;")}')" title="Excluir lista" style="padding:6px 8px;line-height:1;"><svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></td></tr>`).join('');
+        }
+
+        async function deleteList(id, name) {
+            if (!confirm(`Tem certeza que deseja excluir a lista "${name}"?\n\nTodos os contatos desta lista serão removidos permanentemente.`)) return;
+            try {
+                const res = await fetch(`/api/lists/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.error) {
+                    toast(data.error, 'error');
+                } else {
+                    toast(data.message || 'Lista excluída com sucesso!');
+                    loadContactsPage();
+                    updateDashboard();
+                }
+            } catch (err) {
+                toast('Erro ao excluir lista', 'error');
+            }
+        }
+
+        async function viewList(id, name) {
+            const contacts = await api(`/api/lists/${id}/contacts`);
+            document.getElementById('overTitle').innerText = name;
+            document.getElementById('overContent').innerHTML = `<table><thead><tr><th>Nome</th><th>Fone</th></tr></thead><tbody>${contacts.map(c => `<tr><td>${escapeHTML(c.name)}</td><td>${escapeHTML(c.phone)}</td></tr>`).join('')}</tbody></table>`;
+            document.getElementById('overlay').classList.add('open');
+        }
+
+        async function openManualModal() {
+            const lists = await api('/api/lists');
+            document.getElementById('overTitle').innerText = 'Novo Contato';
+            document.getElementById('overContent').innerHTML = `
+                <div class="form-group"><label>Lista</label><select id="mList">${lists.map(l => `<option value="${l.id}">${escapeHTML(l.name)}</option>`).join('')}</select></div>
+                <div class="form-group"><label>Nome</label><input type="text" id="mName" placeholder="Ex: João da Silva"></div>
+                <div class="form-group"><label>Fone (com DDI)</label><input type="text" id="mPhone" placeholder="Ex: 5511999990000"></div>
+                <button class="btn btn-primary" onclick="saveManual()">Salvar Contato</button>
+            `;
+            document.getElementById('overlay').classList.add('open');
+        }
+
+        async function saveManual() {
+            const res = await api('/api/contacts/manual', 'POST', { listId: document.getElementById('mList').value, name: document.getElementById('mName').value, phone: document.getElementById('mPhone').value });
+            if(res.error) toast(res.error, 'error'); else { toast('Contato salvo!'); closeOver(); loadContactsPage(); updateStats(); }
+        }
+
+        function closeOver() { document.getElementById('overlay').classList.remove('open'); }
+        
+        async function createCampaign() { 
+            const name = document.getElementById('campaignName').value;
+            const message = document.getElementById('campaignMessage').value;
+            const minDelay = parseInt(document.getElementById('minDelay').value);
+            const maxDelay = parseInt(document.getElementById('maxDelay').value);
+            
+            if(!name || !message) {
+                return toast('Preencha o nome e a mensagem do modelo', 'error');
+            }
+            
+            await api('/api/campaigns', 'POST', { name, message, minDelay, maxDelay }); 
+            toast('Modelo de campanha salvo com sucesso!'); 
+            
+            document.getElementById('campaignName').value = '';
+            document.getElementById('campaignMessage').value = '';
+            updateDashboard(); 
+        }
+        
+        async function createFlow() { 
+            const name = document.getElementById('flowName').value;
+            if(!name) return toast('Preencha o nome do funil', 'error');
+            
+            await api('/api/flows', 'POST', { name }); 
+            toast('Novo funil criado!'); 
+            document.getElementById('flowName').value = '';
+            updateDashboard(); 
+        }
+        
+        async function addStep() { 
+            const flowId = document.getElementById('flowSelect').value;
+            const message = document.getElementById('stepMessage').value;
+            const delayMinutes = parseInt(document.getElementById('stepDelay').value);
+            const order = parseInt(document.getElementById('stepOrder').value);
+            
+            if(!flowId) return toast('Selecione ou crie um funil primeiro', 'error');
+            if(!message) return toast('Digite a mensagem da etapa', 'error');
+            
+            const res = await api(`/api/flows/${flowId}/steps`, 'POST', { message, delayMinutes, order }); 
+            
+            if(res.error) {
+                toast(res.error, 'error');
+            } else {
+                toast('Etapa adicionada à sequência!'); 
+                document.getElementById('stepMessage').value = '';
+                await updateDashboard(); 
+            }
+        }
+        
+        async function startCampaign() { 
+            const campaignId = document.getElementById('startCampaignSelect').value;
+            const listId = document.getElementById('startListSelect').value;
+            
+            if(!campaignId || !listId) return toast('Selecione um modelo e uma lista', 'error');
+            
+            const res = await api('/api/campaigns/start', 'POST', { campaignId, listId }); 
+            if(res.error) {
+                toast(res.error, 'error');
+            } else {
+                toast(res.message || 'Disparos de campanha iniciados!');
+                // Wait 1 second to fetch the queue and expand the widget for the user!
+                setTimeout(() => {
+                    expandWidget();
+                }, 1000);
+            }
+        }
+        
+        async function startFlow() { 
+            const flowId = document.getElementById('startFlowSelect').value;
+            const listId = document.getElementById('startListSelectFlow').value;
+            
+            if(!flowId || !listId) return toast('Selecione um funil e uma lista', 'error');
+            
+            const res = await api('/api/flows/start', 'POST', { flowId, listId }); 
+            if(res.error) {
+                toast(res.error, 'error');
+            } else {
+                toast(res.message || 'Leads inseridos no funil com sucesso!');
+                // Wait 1 second to fetch the queue and expand the widget for the user!
+                setTimeout(() => {
+                    expandWidget();
+                }, 1000);
+            }
+        }
+
+        async function updateDashboard() {
+            updateStats();
+            
+            const lists = await api('/api/lists');
+            globalLists = lists;
+            const opts = lists.map(l => `<option value="${l.id}">${escapeHTML(l.name)}</option>`).join('');
+            document.getElementById('startListSelect').innerHTML = opts;
+            document.getElementById('startListSelectFlow').innerHTML = opts;
+            
+            const cams = await api('/api/campaigns');
+            globalCampaigns = cams;
+            document.getElementById('startCampaignSelect').innerHTML = cams.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');
+            
+            const flows = await api('/api/flows');
+            globalFlows = flows;
+            const fOpts = flows.map(f => `<option value="${f.id}">${escapeHTML(f.name)}</option>`).join('');
+            document.getElementById('flowSelect').innerHTML = fOpts;
+            document.getElementById('startFlowSelect').innerHTML = fOpts;
+            
+            // Re-render subelements dynamically
+            renderFlowTimeline();
+            updateCalculations();
+            updateCalculationsFlow();
+            pollQueueStatus();
+        }
+
+        async function resetSys() { if(confirm('Tem certeza de que deseja resetar todo o sistema? Todos os dados serão limpos.')) { await api('/api/system/reset', 'POST'); location.reload(); } }
+
+        // Start polling and initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboard();
+            // Start queue state updater timer (polls every 3 seconds)
+            queuePollingInterval = setInterval(pollQueueStatus, 3000);
+        });
+    </script>
+</body>
+</html>
